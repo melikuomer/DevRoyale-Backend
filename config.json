@@ -1,0 +1,11 @@
+{
+  "database" : {
+    "database_name": "devroyale",
+    "ip":"",
+    "port": 3306,
+    "username": "",
+    "password": ""
+  }
+
+
+}

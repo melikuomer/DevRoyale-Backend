@@ -1,0 +1,19 @@
+{
+  "name": "bitirmebackend",
+  "version": "1.0.0",
+  "description": "A backend for duel style programming  web game",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "keywords": [
+    "backend",
+    "web"
+  ],
+  "author": "Meliksah Ustaoemr",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mysql": "^2.18.1"
+  }
+}
