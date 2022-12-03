@@ -1,10 +1,10 @@
 {
   "database" : {
     "database_name": "devroyale",
-    "ip":"",
+    "ip":"192.168.195.79",
     "port": 3306,
-    "username": "",
-    "password": ""
+    "username": "root",
+    "password": "cokgergin31_"
   }
 
 
