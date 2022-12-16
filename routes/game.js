@@ -24,3 +24,5 @@ function on_MatchFound(players){
 }
 // implement a current games buffer
 //
+
+//todo Keep how much time spent for each solution until the submit endpoint receives input

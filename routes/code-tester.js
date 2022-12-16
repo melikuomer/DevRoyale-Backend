@@ -9,5 +9,7 @@ const vm = new VM({
 });
 
 let number = vm.run('console.log(1323)'); // returns 1337
-
+//todo add console.log and console.read overrides
+//todo add eslint
+//todo
 console.log(number)
