@@ -3,6 +3,8 @@ const mysql = require('mysql2');
 
 const database = require("../config.json").database;
 
+
+
 const connection = mysql.createConnection({
     host : database.ip,
     user : database.username,
@@ -11,7 +13,7 @@ const connection = mysql.createConnection({
 });
 
 
-connection.query("select user()",(err,result)=>{
+module.exports.query = connection.query("select user()",(err,result)=>{
     console.log(result);
-})
+});
 
