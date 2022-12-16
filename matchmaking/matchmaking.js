@@ -6,7 +6,7 @@ const { uuid } = require('uuidv4');
 module.exports = router;
 
 
-const connections = {};
+let connections = [];
 // Todo using sse create a matchmaking server
 // Todo Modify queue to have 'response' endpoints as well as userId
 
@@ -17,17 +17,19 @@ router.get('/events', (req, res) => {
     const sse = res.sse();
     // store a reference to the client's connection
     const connectionId = uuid();
-    connections[connectionId] = res;
+    connections.push(sse);
 
     // send a welcome event to the client
     sse.send(JSON.stringify({ message: 'Welcome!' , id:connectionId}));
-sse.close();
+    //sse.close is required to see output on postman
+    //sse.close();
 
 });
 
 setInterval(()=>{
+connections.forEach(connection => connection.send(JSON.stringify({message: 'sa'})))
 
-},5)
+},1000)
 
 router.post('/send-event', (req, res) => {
     // get the connection ID and event data from the request body
