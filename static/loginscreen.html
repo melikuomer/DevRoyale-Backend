@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DevRoyale Login</title>
+</head>
+<body>
+This is the login screen
+
+<form name="loginInfo" id="form">
+    <label for="email">Email</label>
+    <input type="email" name="email" id="email" value="">
+    <label for="password">Sifre</label>
+    <input type="password" name="password" id="password" value="">
+    <button type="button" onclick="onSubmit()">Giris Yap</button>
+
+</form>
+</body>
+<script>
+    const url = "../session";
+
+    function onSubmit(){
+        let elements =document.getElementById("form").elements;
+        let data =[];
+        console.log(elements);
+        for(var i = 0 ; i < elements.length ; i++){
+            var item = elements.item(i);
+            data[item.name] = item.value;
+        }
+        fetch(url, {
+            method : "POST",
+            body: data
+            // -- or --
+            // body : JSON.stringify({
+            // user : document.getElementById('user').value,
+            // ...
+            // })
+        }).then(
+            response =>  // .json(), etc.
+            // same as function(response) {return response.text();}
+            {
+
+                response.text().then(value =>sessionStorage.setItem("JWT", value) )
+
+            }
+        ).then(
+           value=> console.log(sessionStorage.getItem("JWT"))
+        )
+    }
+</script>
+</html>
