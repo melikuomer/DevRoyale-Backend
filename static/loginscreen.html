@@ -21,31 +21,28 @@ This is the login screen
 
     function onSubmit(){
         let elements =document.getElementById("form").elements;
-        let data =[];
-        console.log(elements);
-        for(var i = 0 ; i < elements.length ; i++){
-            var item = elements.item(i);
-            data[item.name] = item.value;
+        let data ={};
+        for(let i = 0 ; i < elements.length ; i++){
+            let item = elements.item(i);
+            if(item.name!=="")
+                data[item.name] = item.value;
         }
         fetch(url, {
             method : "POST",
-            body: data
-            // -- or --
-            // body : JSON.stringify({
-            // user : document.getElementById('user').value,
-            // ...
-            // })
+            headers : {
+              'Content-Type':"application/json"
+            },
+            body:  JSON.stringify(data)
         }).then(
             response =>  // .json(), etc.
             // same as function(response) {return response.text();}
             {
-
-                response.text().then(value =>sessionStorage.setItem("JWT", value) )
+                response.text().then(value =>localStorage.setItem('jwt', value) )
 
             }
         ).then(
-           value=> console.log(sessionStorage.getItem("JWT"))
-        )
+           value=> console.log(localStorage.getItem('jwt'))
+        ).catch(()=>console.log(data))
     }
 </script>
 </html>

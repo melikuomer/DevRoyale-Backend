@@ -12,14 +12,18 @@ router.post('/',login)
 
 function login(req, res){
 
+
     let user = {
-        name: "Ahmet",
-        lastname: "Veren",
+        email: req.body.email,
+        password: req.body.password,
     }
+    //user = JSON.parse(req.body);
+    console.log(req.body)
     jwt.sign(user,config.randomBytes,{   expiresIn: '24h'},(err , value)=>{
         if (err) return err;
         res.json(value);
     });
 }
+
 
 
