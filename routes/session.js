@@ -35,40 +35,36 @@ function login(req, response){
         {
             email: "",
             password: "",
+
         };
 
         console.log(user);
 
-    let sqlQuery = `SELECT email , password FROM devroyale.users WHERE
+    let sqlQuery = `SELECT * FROM devroyale.users WHERE
         email = "${user.email}" AND
         password = "${user.password}";`
 
     console.log(sqlQuery);
 
-    con.connect(function(err) {
-        if (err) throw err;
-        console.log("Connected!");
-        con.query(sqlQuery, function (err, res ) {
-            if (err) throw err;
-            console.log("res" , res);
-            if (res){
-            console.log("res.email = ", res[0].email);
-            Dbuser.email = res[0].email;
-            Dbuser.password = res[0].password;}
-            console.log("after edit =",Dbuser);
-        });
-    });
 
-    console.log("Dbuser",Dbuser);    
-    if (Dbuser.email == user.email && Dbuser.password == user.password )
-    {
-      console.log("test");
+        console.log("Connected!");
+    con.query(sqlQuery, getUser);
+
+    function getUser (err, res ) {
+        if (err) {
+            response.status(500).send("Unexpected server issue");
+            throw err;
+        }
+        if(res.length ===0) {
+            response.status(401).send("Incorrect username or password");
+            return;
+        }
+        console.log("test");
         jwt.sign(user,config.randomBytes,{   expiresIn: '24h'},(err , value)=>{
             if (err) return err;
             response.json(value);
         });
     }
-    response.json()
     //user = JSON.parse(req.body);
    // console.log(req.body)
 }

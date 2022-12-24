@@ -17,3 +17,4 @@ module.exports.query = connection.query("select user()",(err,result)=>{
     console.log(result);
 });
 
+
