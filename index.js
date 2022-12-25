@@ -19,6 +19,11 @@ app.use(express.urlencoded({
 }));
 app.use(cors());
 
+app.use(((req, res, next) =>{
+    console.log(req.header('Authorization'));
+    next();
+}));
+
 app.use(express.static('static'));
 
 

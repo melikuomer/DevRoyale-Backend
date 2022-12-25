@@ -27,17 +27,10 @@ router.post('/',login)
 
 function login(req, response){
     
-        let user = {
-            email: req.body.email,
-            password: req.body.password,
-        }
-        let Dbuser =
-        {
-            email: "",
-            password: "",
-
-        };
-
+    let user = {
+        email: req.body.email,
+        password: req.body.password,
+    }
         console.log(user);
 
     let sqlQuery = `SELECT * FROM devroyale.users WHERE
