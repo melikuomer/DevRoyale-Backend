@@ -15,20 +15,16 @@ let newUser = {
     lastname: "tunay",
     email:  "yetun123y@gmail.com",
     password: "123124213",              //todo add passwd security 
-    description: "hoşgeldiniz",
+    // description: "hoşgeldiniz",
 };
 
-//console.log(newUser);
-
-let sqlQuery = `INSERT INTO devroyale.users(first_name,last_name,email,password,create_time,description)VALUES(
+let sqlQuery = `INSERT INTO devroyale.users(first_name,last_name,email,password,create_time)VALUES(
     "${newUser.firstName}" ,
     "${newUser.lastname}",
     "${newUser.email}",
     "${newUser.password}",
-    now(),
-    "${newUser.description}"
+    now()
 );`
-
 
 con.connect(function(err) {
     if (err) throw err;
