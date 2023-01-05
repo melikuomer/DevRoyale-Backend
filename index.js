@@ -28,9 +28,9 @@ app.use(express.static('static'));
 
 
 
-app.use('/session',require("./routes/session.js"))
-app.use('/matchmaking', require("./matchmaking/matchmaking.js"));
-
+app.use('/session',require("./routes/session.js"));
+app.use('/matchmaking', require("./routes/matchmaking.js"));
+app.use('/user',require("./routes/user.js"));
 
 app.listen(3000, (value)=>{
     console.log("server is running on port: 3000");
