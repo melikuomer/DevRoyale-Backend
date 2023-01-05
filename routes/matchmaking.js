@@ -40,6 +40,6 @@ router.post('/send-event', (req, res) => {
 
 
 
-matchmaking.Event.on("MatchFound", (value)=>{
-    console.log(value);
+matchmaking.Event.on('MatchFound', (value)=>{
+    console.log("Match Made"+ "Player IDs: "+ value[0].id + " & " + value[1].id);
 })

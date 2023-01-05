@@ -27,5 +27,8 @@
     "sqlite3": "^5.1.2",
     "uuidv4": "^6.2.13",
     "vm2": "^3.9.12"
+  },
+  "devDependencies": {
+    "eslint": "^8.31.0"
   }
 }

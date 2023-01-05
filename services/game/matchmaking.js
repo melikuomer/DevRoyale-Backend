@@ -1,92 +1,7 @@
-
-
-let id = [1,24,53,21,74,67,16,26]//users
-let playerlist = []
-let queue = [];
-
-for(let i = 0;i<30;i++){//fill queue with 0s because we need to ensure that at start queue will be empty
-    queue[i] = 0;
-}
-
-
-class player {
-    constructor(count){
-
-        this.nick = "player " + String(id[count])
-        this.id = id[count]
-        this.elo = Number(2880 + Math.floor(Math.random() * 20));
-        this.MatchCount = 1;
-        this.WinCount = 1;
-        this.LoseCount = 1;
-        this.winrate = this.WinCount/ this.MatchCount;
-        this.tempElo = this.elo * this.winrate;
-        this.ingame = false;
-        this.index = parseInt(this.tempElo/100)
-        this.p2 = this.tempElo - this.index*100;
-
-    }
-}
-
-// 1968 => queue[19][68] != 0 => foundgame
-function foundGame(playerid, player2id) {
-   console.log(String(playerid) + " " + String(player2id) + " eslesti");
-}
-
-function normalSearch(_player){
-    if(ingameplayers[_player.id] === 1){return;}
-
-    index = parseInt(_player.elo / 100);
-    p2 = _player.elo - index*100;
-    if(queue[index][p2] === 0){
-        queue[index][p2] = _player.id;
-        return 0;
-    }
-    else if(queue[index][p2] !== 0 && queue[index][p2] !== _player.id ){
-        foundGame(_player.id,queue[index][p2]);
-        ingameplayers[queue[index][p2]] = 1;
-        playerlist[queue[index][p2]].ingame = true;
-        ingameplayers[_player.id] = 1;
-        _player.ingame = true;
-        queue[index][p2] = 0;
-        return queue[index][p2];
-    }
-}
-
-function AddtoQueue(_player,tempElo){
-    let pocketSize = 100;
-    let index = parseInt(_player.tempElo / 100);
-
-    if(index>=queue.length)return;
-
-    switch (queue[index]) {
-        case 0:
-            queue[index]= _player.id;
-            break;
-
-        case _player.id:
-            if(tempElo>_player.tempElo)
-                AddtoQueue(_player, tempElo+pocketSize);
-            if(tempElo<_player.tempElo)
-                AddtoQueue(_player, tempElo-pocketSize);
-            if(tempElo !==_player.tempElo)
-            {
-            AddtoQueue(_player, tempElo - pocketSize);
-            AddtoQueue(_player, tempElo + pocketSize);
-            }
-            break;
-
-        default:
-            console.log("eslesenler : " + String(_player.id) + " ve " + String(queue[index]));
-            foundGame(_player.id,queue[index])
-            return;
-            break;
-    }
-}
-
 const queueConfig = require('../../config.json').queue; 
 const  events = require('events');
 
-const emptySlot = 0;
+const EMPTY_SLOT = {"id":0, "tempElo":0};
 
 class Queue {
     
@@ -94,8 +9,8 @@ class Queue {
     
     constructor(config){
         this.Event = new events.EventEmitter();
-        this.pocketSize = config.pocketSize;         
-        this.QueueList = Array(this.pocketSize, emptySlot);
+        this.pocketSize = config.pocketsize;         
+        this.queueList = new Array(this.pocketSize).fill( EMPTY_SLOT);
         
         
 
@@ -106,18 +21,102 @@ class Queue {
 
     }
 
-    Add = function (player){
+    AddPlayer = function (players){
+
+        const player = players[0];
+        let rootIndex = parseInt(player.tempElo / this.pocketSize);
+        let currentIndex;
+        if(!players[1]){
+            currentIndex = rootIndex;
+            console.log('first entry')
+        }else currentIndex =players[1]
+
+        if(currentIndex>=this.queueList.length)return;
         
+        switch (this.queueList[currentIndex].id) {
+            case 0:
+                this.queueList[currentIndex]= player;
+                console.log('ok')
+                break;
+    
+            case player.id:
+                if(currentIndex>rootIndex)                    
+                    this.AddPlayer([player, currentIndex+1]);
+                if(currentIndex<rootIndex)
+                    this.AddPlayer([player, currentIndex-1]);
+                if(currentIndex ===rootIndex)
+                {                    
+                    this.AddPlayer([player, currentIndex+1]);        
+                    this.AddPlayer([player, currentIndex-1]);
+                }
+                break;
+    
+            default:
+                console.log("eslesenler : " + String(player.id) + " ve " + String(this.queueList[currentIndex].id));
+                this.MatchFound([player,this.queueList[currentIndex]]);
+                break;
+        }
     }
     
     MatchFound= function(players){
-        queue.Event.emit("MatchFound", players);
+        this.ResetPocket(this.EloToIndex(players[0].tempElo));        
+        this.CheckAdjacentRecursive(this.EloToIndex(players[0].tempElo), players[0].id,(index) =>{    
+            this.ResetPocket(index);            
+        });
+        this.ResetPocket(this.EloToIndex(players[1].tempElo));        
+        this.CheckAdjacentRecursive(this.EloToIndex(players[1].tempElo), players[1].id,(index) =>{    
+            this.ResetPocket(index);            
+        });
+       
+        this.Event.emit('MatchFound', players);
+    }
+
+    ResetPocket = function (index){
+        this.queueList[index] = EMPTY_SLOT;
+    }
+
+    CheckAdjacentRecursive = function (index, value , callback){
+        console.log(value)
+        if(this.queueList[index+1].id===value) {
+            callback(index+1);
+            this.CheckAdjacentRecursive(index+1,value, callback);
+
+        }
+
+        if(this.queueList[index-1].id===value) {
+            callback(index-1);
+            this.CheckAdjacentRecursive(index-1, value, callback);
+
+        }
+
+        
+    }
+
+    EloToIndex = function (elo){
+        return parseInt(elo / this.pocketSize);
     }
 
 }
 
 let queue  = new Queue(queueConfig);
 queue.Init();
+
+
+//queue test
+setTimeout(()=>{
+    let player = {"id": 231124, "tempElo": 1200};
+    let secondPlayer = {"id": 256124, "tempElo": 900};
+    queue.AddPlayer([player]);
+    queue.AddPlayer([secondPlayer])
+    queue.AddPlayer([player]);
+    queue.AddPlayer([player]);
+    queue.AddPlayer([player]);
+    setTimeout(()=>{
+        console.log(queue.queueList);
+    }, 1000*2);
+}, 1000*1)
+
+
 
 module.exports = queue;
 
