@@ -6,6 +6,8 @@
     "username": "root",
     "password": "cokgergin31_"
   },
- "randomBytes": "c78dea244d4b49a1a0aac942424cf90f"
-
+ "randomBytes": "c78dea244d4b49a1a0aac942424cf90f",
+  "queue":{
+      "pocketsize": 100
+  }
 }

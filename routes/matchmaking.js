@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router({});
 const sse = require('express-sse');
 const { uuid } = require('uuidv4');
+const matchmaking  = require('../services/game/matchmaking.js');
+
 
 module.exports = router;
 
@@ -35,3 +37,9 @@ router.post('/send-event', (req, res) => {
     // send the event to the client
     sse().send(data, event, connectionId);
 });
+
+
+
+matchmaking.Event.on("MatchFound", (value)=>{
+    console.log(value);
+})
