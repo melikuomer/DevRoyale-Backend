@@ -18,3 +18,8 @@ module.exports = function authenticateToken(req, res, next) {
         next()
     })
 }
+
+
+module.exports = function getUserFromToken(token){
+    return jwt.decode(token,);
+}
