@@ -2,10 +2,11 @@ const jwt = require('jsonwebtoken');
 const secret = require('../config.json').randomBytes;
 
 
-module.exports = function authenticateToken(req, res, next) {
+exports.authenticateToken = function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1]
 
+    console.log("authHeader",token);
     if (token == null) return res.sendStatus(401)
 
     jwt.verify(token, secret, (err, user) => {
@@ -20,6 +21,10 @@ module.exports = function authenticateToken(req, res, next) {
 }
 
 
-module.exports = function getUserFromToken(token){
-    return jwt.decode(token,);
+exports.getUserFromToken = function getUserFromToken(token){
+    return jwt.decode(token);
+}
+
+exports.createToken = function createToken(req, res, next){
+
 }
