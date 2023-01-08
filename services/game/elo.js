@@ -9,7 +9,7 @@ function eloCalculation(elo1,elo2){
     return x;
 }
 
-function truncate(value){ // elonun anası sikilmesin diye truncate functionu yazdım
+function truncate(value){ //  truncate functionu sayıları kontrol etmek için
     if(value > 200){
         return 200;
     }
