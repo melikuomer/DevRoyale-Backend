@@ -1,13 +1,16 @@
 const sql = require("./services/mysql-manager");
 
-
-const parser = require("body-parser");
 const express =require("express");
 const cors = require("cors");
-const {sseMiddleware} = require("express-sse");
 const app = express();
 
 const jwt = require("jsonwebtoken");
+
+
+const http = require('http');
+const server = http.createServer(app);
+const {Server} = require('socket.io');
+const io = new Server(server)
 
 
 process.title = require("./package.json").name;
@@ -34,7 +37,16 @@ app.use('/user',require("./routes/user.js"));
 app.use('/register',require("./routes/register.js"));
 app.use('/login',require("./routes/login.js"))
 
-app.listen(3000, (value)=>{
+io.on('connection', (socket) => {
+    //socket.emit('GameState', {Zort:'Yetkini Siktim'})
+    socket.on('JoinQueue', (value)=>{
+        console.log(JSON.stringify(value))
+    })
+    console.log('a user connected');
+
+  });
+
+server.listen(3000, (value)=>{
     console.log("server is running on port: 3000");
 });
 

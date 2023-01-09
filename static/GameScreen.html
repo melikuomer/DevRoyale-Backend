@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+<body>
+    <label for="userId">Kullanıcı Idsi</label>
+    <input id = "userId" name = "userId" value ="1231224"></input>
+    <label for ="elo">Elo</label>
+
+    <input type="number" id ="elo" name="elo" value ="2000"></input>
+    
+
+    <button onclick="JoinQueue()"> Sıraya Gir</button>
+
+    <div><label for ="code">Kod:</label></div>
+    
+
+    <textarea id="code" name="code"></textarea>
+    <div></div>
+    <button onclick="TestCode">Kodu Test Et</button>
+
+    <button type="button" onclick="SubmitCode">Kodu Gönder</button>
+</body>
+
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    var socket = io();
+
+    socket.on('GameState', (data)=>{
+    alert(data.Zort);
+    })
+  function JoinQueue(){
+    let id = document.getElementById('userId').value;
+    let elo = document.getElementById('elo').value
+    socket.emit('JoinQueue',{id: id, elo:elo});
+  }
+
+  function SubmitCode(){
+
+  }
+
+  function TestCode(){
+
+  }
+</script>
+</html>

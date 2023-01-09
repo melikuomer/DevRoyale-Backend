@@ -3,37 +3,33 @@ const  events = require('events');
 
 const EMPTY_SLOT = {"id":0, "tempElo":0};
 
+
 class Queue {
-    
-    
-    
     constructor(config){
         this.Event = new events.EventEmitter();
         this.pocketSize = config.pocketsize;         
         this.queueList = new Array(this.pocketSize).fill( EMPTY_SLOT);
-        
+   
     }
 
     Init  = function (){
 
     }
 
-    AddPlayer = function (players){
+    AddPlayer = function (players){ 
 
         const player = players[0];
-        let rootIndex = parseInt(player.tempElo / this.pocketSize);
+        let rootIndex = this.EloToIndex(player.tempElo);
         let currentIndex;
         if(!players[1]){
             currentIndex = rootIndex;
-            console.log('first entry')
         }else currentIndex =players[1]
 
         if(currentIndex>=this.queueList.length)return;
-        
+
         switch (this.queueList[currentIndex].id) {
             case 0:
                 this.queueList[currentIndex]= player;
-                console.log('ok')
                 break;
     
             case player.id:
