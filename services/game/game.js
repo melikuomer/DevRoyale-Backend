@@ -1,27 +1,60 @@
 
 const { v1 } = require('uuid');
 const EventEmitter = require('events');
+const {createClient} = require('redis');
 
-const CodeTester = 
+const client = createClient();
 
 
-class GameManager{
+client.on('error', (err)=>console.log('Redis client Error:: ',err));
 
-    constructor(question, players){
-        this.questionString = question.string;
-        this.requiredTime = question.requiredTime;
-        
+
+
+
+
+function GetQuestion(){
+    let Question = {
+        QuestionID: "123124",//redis
+        Text:" bunlari yap",
+        RequiredTime: 15, //redis
+        TestCases: [], //redis
+        ExpectedResult: [], //redis
     }
-
-
-
-    CreateGame = function (players, question){
-        //create and return new game instance
-    }
-
-
+    return Question;
+}
+const Game = {
+    GameId: number,
+    Question: {
+        QuestionID: '',
+        CompetitionTime: '',
+        TestCases: '',
+        ExpectedResult: ''
+    },
+    Players: [{id:'',score: []},]
 }
 
+function Submit(user, gameId, code){
+    const players = client.hGet(gameId).Players;
+    const player = players.filter(x => x !==user.id);
+    if(player.length<1) res.status(403).send();
+    
+}
+async function CreateGame(players){
+    
+    const gameId = v1();
+
+    await client.connect();
+    
+    const questions=  client.hSet(gameId, 'Question',JSON.stringify(GetQuestion()));
+    const playersHash =  client.hSet(gameId, 'Players', JSON.stringify(players));
+
+    await Promise.all([questions, playersHash]);
+    let all_keys = await client.hGetAll(gameId);
+    await client.disconnect();
+    return all_keys;  
+}
+const player ={id:3131, name:'Hasan'};
+CreateGame([player, player]).then(value =>console.log(value));
 
 
 class Game{
@@ -32,7 +65,7 @@ class Game{
         this.requiredTime = 15;
         this.players = players;
         this.playerMap = new Map();
-        this.playerMap.set("Ahmet", 213123);
+
 
         this.GameState = new EventEmitter();
         
@@ -59,8 +92,3 @@ class Game{
 
 }
 
-
-
-let game = new Game();
-
-console.log(game.playerMap.get('Ahmet'));
