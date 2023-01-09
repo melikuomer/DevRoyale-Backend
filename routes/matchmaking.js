@@ -8,9 +8,9 @@ const matchmaking  = require('../services/game/matchmaking.js');
 module.exports = router;
 
 let connections = [];
-// Todo using sse create a matchmaking server
-// Todo Modify queue to have 'response' endpoints as well as userId
-// todo use express-sse
+// TODO: using sse create a matchmaking server
+// TODO: Modify queue to have 'response' endpoints as well as userId
+// TODO: use express-sse
 
 
 router.get('/events', (req, res) => {
@@ -41,5 +41,5 @@ router.post('/send-event', (req, res) => {
 
 
 matchmaking.Event.on('MatchFound', (value)=>{
-    console.log("Match Made"+ "Player IDs: "+ value[0].id + " & " + value[1].id);
+    console.log("Match Made"+ " Player IDs: "+ value[0].id + " & " + value[1].id);
 })

@@ -14,7 +14,7 @@ function RegisterUser(req,response) {
         firstName: req.body.firstName,
         lastname: req.body.lastname,
         email:  req.body.email,
-        password: req.body.password,              //todo add passwd security 
+        password: req.body.password,              //TODO: add passwd security 
         // description: "hoşgeldiniz",
     };
     console.log(newUser);
@@ -25,7 +25,7 @@ function RegisterUser(req,response) {
         firstName: "yetkin",
         lastname: "tunay",
         email:  "yetun123@gmail.com",
-        password: "123124213",              //todo add passwd security 
+        password: "123124213",              //TODO: add passwd security 
         // description: "hoşgeldiniz",
     };
     */
@@ -57,10 +57,10 @@ function updateUser(req,response) {
 
 
 router.post('/',RegisterUser);
-// todo register new user while encrypting and salting the password with 'bcrypt'
-// todo if user with same email exists return error
-// todo verify user input
-// todo generate random bytes on config file for encrypting purposes
+// TODO: register new user while encrypting and salting the password with 'bcrypt'
+// TODO: if user with same email exists return error
+// TODO: verify user input
+// TODO: generate random bytes on config file for encrypting purposes
 
 router.get('/',getUser);
 // get user with parameter

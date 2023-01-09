@@ -12,9 +12,6 @@ class Queue {
         this.pocketSize = config.pocketsize;         
         this.queueList = new Array(this.pocketSize).fill( EMPTY_SLOT);
         
-        
-
-
     }
 
     Init  = function (){
@@ -77,6 +74,8 @@ class Queue {
 
     CheckAdjacentRecursive = function (index, value , callback){
         console.log(value)
+        if(index>this.queueList.length||index<0) return;
+        
         if(this.queueList[index+1].id===value) {
             callback(index+1);
             this.CheckAdjacentRecursive(index+1,value, callback);
@@ -110,6 +109,7 @@ setTimeout(()=>{
     queue.AddPlayer([secondPlayer])
     queue.AddPlayer([player]);
     queue.AddPlayer([player]);
+    console.log(queue.queueList)
     queue.AddPlayer([player]);
     setTimeout(()=>{
         console.log(queue.queueList);

@@ -26,12 +26,14 @@ expectedOutput = [3,4,11];
 
 //TODO: Create an endpoint to receive user-sent scripts
 //TODO: Replace hardcoded script with user-sent script; 
+//TODO: Add error handling;
 let mainFunction = vm.run('module.exports = function (input){return input[0]+input[1];}') // this later will be replaced by code received from the user
 
 
 function TestProgram(testCases, expectedOutputs){ //This piece will run the code with each test case AND return executionTime with the test result;
 
     let results = [];
+    //TODO: Run each test multiple times to get more consistent result;
     testCases.forEach((element , index)=> {    //run for each test case;
         let executionTime = process.hrtime(); //get a start time;
         let resultString = `Test ${index}: `;
@@ -47,7 +49,7 @@ function TestProgram(testCases, expectedOutputs){ //This piece will run the code
 }
 
 
-function FormatExecutionTime(executionTime){  //converts seconds and nanoseconds parts to milliseconds;    
+function FormatExecutionTime(executionTime){  //converts second and nanosecond parts to milliseconds;    
     const nanoSecToMiliSeconds = 1e6;
     const secondsToMilliSeconds = 1e3;
     return executionTime[0]*secondsToMilliSeconds + executionTime[1]/nanoSecToMiliSeconds
