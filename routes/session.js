@@ -18,7 +18,7 @@ const con = mysql.createConnection({
     database: database.database_name
 });
 
-
+// KULLANILMIYOR
 
 router.post('/',login)
 

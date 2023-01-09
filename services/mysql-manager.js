@@ -9,27 +9,37 @@ const con = mysql.createConnection({
   database: database.database_name,
 });
 
-// we need to make this functions async
 
-exports.getUsers = function (callback) {
+exports.getUsers =  function (callback) {
   const sql = "SELECT * FROM users";
   con.query(sql, function (error, results, fields) {
-    if (error) return callback(error);
+    if (error) throw new Error(error);
     callback(null, results);
   });
 };
 
 exports.getUser = function (user_id,callback) {
-const sql = "SELECT * FROM users WHERE user_id = ?";
-con.query(sql, user_id ,function (error, results, fields) {
-  if (error) return callback(error);
-  callback(null, results);
-});
+  const sql = "SELECT * FROM users WHERE user_id = ?";
+  con.query(sql, user_id ,function (error, results, fields) {
+    if (error) return callback(error);
+    callback(null, results);
+  });
 };
 
+// need to check email in register
+exports.getUserByEmail = async function (email,callback) {
+  const sql = "SELECT * FROM users WHERE email = ?";
+  con.query(sql, email ,function (error, results, fields) {
+    if (error) return callback(new Error(error),null);
+    callback(null, results);
+  });
+};
+
+
+
+// TODO maybe add promises
+// working ************************************************************
 exports.createUser = function (newUser, callback) {
-  // not working now 
-  console.log("newUser",newUser);
   const sql = `INSERT INTO devroyale.users(first_name,last_name,email,password,create_time)VALUES(
     "${newUser.firstName}" ,
     "${newUser.lastname}",
@@ -37,7 +47,7 @@ exports.createUser = function (newUser, callback) {
     "${newUser.password}",
     now());`
   con.query(sql, function (error, results, fields) {
-    if (error) return callback(error);
+    if (error) return callback(new Error(error),null);
     callback(null, results.insertId);
   });
 };
@@ -45,15 +55,16 @@ exports.createUser = function (newUser, callback) {
 exports.updateUser = function (id, updates, callback) {
   const sql = "UPDATE users SET ? WHERE id = ?";
   con.query(sql, [updates, id], function (error, results, fields) {
-    if (error) return callback(error);
+    if (error) return callback(new Error(error),null);
     callback(null, results.affectedRows);
   });
 };
 
-exports.deleteUser = function (id, callback) {
+// working
+exports.deleteUser = function (user_id, callback) {
   const sql = "DELETE FROM users WHERE id = ?";
-  con.query(sql, id, function (error, results, fields) {
-    if (error) return callback(error);
+  con.query(sql, user_id, function (error, results, fields) {
+    if (error) throw callback(error, null);
     callback(null, results.affectedRows);
   });
 };
