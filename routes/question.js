@@ -42,7 +42,7 @@ function addQuestion(req, res){
 
 const queries = require("../services/mysql-manager.js");
 
-module.exports = router;
+
 
 
 // dont need jwt aut
