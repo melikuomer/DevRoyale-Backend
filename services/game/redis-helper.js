@@ -5,7 +5,7 @@ const redisConfig = require('../../config.json').redis;
 const client = createClient({url: redisConfig.url});
 
 
-client.connect();
+client.connect().catch(err=>console.log("LANET OLSUN: "+err));
 client.on('error', (err)=>console.log('Redis client Error:: ',err));
 
 
