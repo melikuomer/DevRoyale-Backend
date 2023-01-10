@@ -43,6 +43,7 @@ app.use('/matchmaking', require("./routes/matchmaking.js"));
 app.use('/user',require("./routes/user.js"));
 app.use('/register',require("./routes/register.js"));
 app.use('/login',require("./routes/login.js"));
+app.use('/question', require("./routes/question.js"));
 
 
 
@@ -63,7 +64,7 @@ io.on('connect', (socket) => {
         //queue.AddPlayer({id: id, elo: elo}) //Push player into queue
         //console.log(JSON.stringify(stuff))
     })
-
+    
     
     socket.on('Test', ({code, gameId})=>{
         if (!isUserInTheGame(gameId)) {
