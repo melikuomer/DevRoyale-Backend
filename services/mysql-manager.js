@@ -54,6 +54,23 @@ exports.createQuestion = function (question, callback) {
 
 
 
+exports.updateElo = function (user_id, elo , callback) {
+  const sql = `UPDATE stats SET elo = ? where user_id = ? ;`
+  con.query(sql,[user_id,elo], function (error, results, fields) {
+    if (error) return callback(new Error(error),null);
+    callback(null, results);
+  });
+};
+
+exports.getElo = function (user_id, callback) {
+  const sql = `SELECT users.user_id , stats.elo FROM users
+  LEFT JOIN stats ON users.user_id = stats.user_id where users.user_id = ?;`
+  con.query(sql,user_id, function (error, results, fields) {
+    if (error) return callback(new Error(error),null);
+    callback(null, results);
+  });
+};
+
 
 
 // TODO maybe add promises
