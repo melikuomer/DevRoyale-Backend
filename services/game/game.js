@@ -49,10 +49,4 @@ async function EndGame(gameId){
     return matchresults;
 }
 
-const player ={ id:3131, name:'Hasan'};
-
-
-Init().then(()=>{
-    CreateGame([player, player]).then(value =>console.log(value));
-})
 
