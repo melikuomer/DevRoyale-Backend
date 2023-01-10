@@ -16,10 +16,8 @@ function getQuestion(req,response) {
 
 function createQuestion(req,response ) {
     const question = req.body
-
     queries.createQuestion( JSON.stringify(question) ,(error,resp) => {
-        if (error) return response.status(404).send("unable the create question")
-
+        if (error) return response.status(404).send(error.toString());
         return response.json(resp)
     })    
 }

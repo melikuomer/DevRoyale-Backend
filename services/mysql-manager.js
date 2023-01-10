@@ -46,7 +46,7 @@ exports.getQuestion = async function (question_id, callback) {
 
 exports.createQuestion = function (question, callback) {
   const sql = `INSERT INTO devroyale.questions(question)VALUES( ? );`
-  con.query(sql, function (error, results, fields) {
+  con.query(sql,question, function (error, results, fields) {
     if (error) return callback(new Error(error),null);
     callback(null, results.insertId);
   });
