@@ -4,7 +4,8 @@
     "ip":"192.168.195.79",
     "port": 3306,
     "username": "root",
-    "password": "cokgergin31_"
+    "password": "cokgergin31_",
+    "connectTimeout": 9000000
   },
  "randomBytes": "c78dea244d4b49a1a0aac942424cf90f",
   "queue":{

@@ -10,17 +10,6 @@ router.post('/', )
 router.put('/')
 
 
-const client = createClient();
-
-client.on('error', (err)=>console.log('Redis client Error:: ',err));
-
-client.connect();
-
-client.set('ahmet','3131331').then(()=>{
-    client.get('ahmet').then(value=> console.log("Ahmet :=  ",value))
-    
-})
-
 
 function JoinQueue(playerId){
     //call matchhmaking system queue function
@@ -32,6 +21,9 @@ function PriorityQueue(playerId){
 }
 
 function on_MatchFound(players){
+
+
+    //get a question from database
     //create an unique game id and add it to a map
     //send players a packet telling the game has started
 }

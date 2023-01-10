@@ -31,11 +31,8 @@ router.get('/events', (req, res) => {
 
 
 router.post('/send-event', (req, res) => {
-    // get the connection ID and event data from the request body
-    const { connectionId, event, data } = req.body;
 
-    // send the event to the client
-    sse().send(data, event, connectionId);
+    
 });
 
 

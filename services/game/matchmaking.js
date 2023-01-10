@@ -3,37 +3,33 @@ const  events = require('events');
 
 const EMPTY_SLOT = {"id":0, "tempElo":0};
 
+
 class Queue {
-    
-    
-    
     constructor(config){
         this.Event = new events.EventEmitter();
         this.pocketSize = config.pocketsize;         
         this.queueList = new Array(this.pocketSize).fill( EMPTY_SLOT);
-        
+   
     }
 
     Init  = function (){
 
     }
 
-    AddPlayer = function (players){
+    AddPlayer = function (players){ 
 
         const player = players[0];
-        let rootIndex = parseInt(player.tempElo / this.pocketSize);
+        let rootIndex = this.EloToIndex(player.tempElo);
         let currentIndex;
         if(!players[1]){
             currentIndex = rootIndex;
-            console.log('first entry')
         }else currentIndex =players[1]
 
         if(currentIndex>=this.queueList.length)return;
-        
+
         switch (this.queueList[currentIndex].id) {
             case 0:
                 this.queueList[currentIndex]= player;
-                console.log('ok')
                 break;
     
             case player.id:
@@ -101,20 +97,24 @@ let queue  = new Queue(queueConfig);
 queue.Init();
 
 
+//Test();
+
 //queue test
-setTimeout(()=>{
-    let player = {"id": 231124, "tempElo": 1200};
-    let secondPlayer = {"id": 256124, "tempElo": 900};
-    queue.AddPlayer([player]);
-    queue.AddPlayer([secondPlayer])
-    queue.AddPlayer([player]);
-    queue.AddPlayer([player]);
-    console.log(queue.queueList)
-    queue.AddPlayer([player]);
+function Test(){
     setTimeout(()=>{
-        console.log(queue.queueList);
-    }, 1000*2);
-}, 1000*1)
+        let player = {"id": 231124, "tempElo": 1200};
+        let secondPlayer = {"id": 256124, "tempElo": 900};
+        queue.AddPlayer([player]);
+        queue.AddPlayer([secondPlayer])
+        queue.AddPlayer([player]);
+        queue.AddPlayer([player]);
+        console.log(queue.queueList)
+        queue.AddPlayer([player]);
+        setTimeout(()=>{
+            console.log(queue.queueList);
+        }, 1000*2);
+    }, 1000*1)
+}
 
 
 
