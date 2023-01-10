@@ -1,6 +1,9 @@
 const { v1 } = require('uuid');
 const {createClient} = require('redis');
-const client = createClient();
+
+const redisConfig = require('../../config.json').redis;
+const client = createClient(redisConfig);
+
 client.connect();
 client.on('error', (err)=>console.log('Redis client Error:: ',err));
 

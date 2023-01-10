@@ -10,5 +10,9 @@
  "randomBytes": "c78dea244d4b49a1a0aac942424cf90f",
   "queue":{
       "pocketsize": 100
+  },
+
+  "redis": {
+    "url":"redis://192.168.195.102:6379" 
   }
 }

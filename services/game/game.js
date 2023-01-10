@@ -1,18 +1,10 @@
 
 const { v1 } = require('uuid');
 const EventEmitter = require('events');
-const {createClient} = require('redis');
-
-const client = createClient();
 
 
-client.on('error', (err)=>console.log('Redis client Error:: ',err));
 
 
-async function Init(){
-    await client.connect();
-    await client.flushAll();
-}
 
 
 function GetQuestion(){

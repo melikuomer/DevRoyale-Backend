@@ -13,9 +13,6 @@ const io = new Server(server)
 
 
 
-const {createClient} = require('redis');
-const client = createClient();
-client.connect();
 
 
 
