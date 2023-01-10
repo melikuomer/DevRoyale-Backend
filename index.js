@@ -21,7 +21,7 @@ client.connect();
 
 const queue = require('./services/game/matchmaking.js');
 const queries = require("./services/mysql-manager.js");
-const {createUserConnection} = require('./services/game/redis-helper.js')
+const {createUserConnection, isUserInTheGame} = require('./services/game/redis-helper.js')
 
 
 process.title = require("./package.json").name;
@@ -69,7 +69,12 @@ io.on('connect', (socket) => {
 
     
     socket.on('Test', ({code, gameId})=>{
-        
+        if (!isUserInTheGame(gameId)) {
+            console.err('User is not in a game');
+            return;
+        }
+                
+
         //Test the code
     })
 

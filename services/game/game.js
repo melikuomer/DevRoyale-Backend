@@ -64,39 +64,3 @@ Init().then(()=>{
     CreateGame([player, player]).then(value =>console.log(value));
 })
 
-
-class Game{
-
-
-    constructor(players){
-        this.ID = v1();
-        this.requiredTime = 15;
-        this.players = players;
-        this.playerMap = new Map();
-
-
-        this.GameState = new EventEmitter();
-        
-    }
-
-
-    Start = function (){
-        const minutesToMilliseconds = 1000*60;
-        this.GameState.emit('GameStarted');
-        setInterval(()=>{
-            
-            this.GameState.emit('GameEnded',{GameId: this.ID,  } );
-
-        }, this.requiredTime*minutesToMilliseconds)
-    }
-
-    CalculateWinners = function (){
-        
-    }
-    
-    onCodeSubmit = function (){
-
-    }
-
-}
-

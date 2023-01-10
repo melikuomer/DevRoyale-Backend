@@ -1,4 +1,4 @@
-const {NodeVM} = require('vm2');
+const {NodeVM, VMScript} = require('vm2');
 
 
 
@@ -27,12 +27,20 @@ expectedOutput = [3,4,11];
 //TODO: Create an endpoint to receive user-sent scripts
 //TODO: Replace hardcoded script with user-sent script; 
 //TODO: Add error handling;
-let mainFunction = vm.run('module.exports = function (input){return input[0]+input[1];}') // this later will be replaced by code received from the user
+//let mainFunction = vm.run('module.exports = function (input){return input[0]+input[1];}') // this later will be replaced by code received from the user
 
 
-function TestProgram(testCases, expectedOutputs){ //This piece will run the code with each test case AND return executionTime with the test result;
-
+function TestProgram(testCases, expectedOutputs, script){ //This piece will run the code with each test case AND return executionTime with the test result;
+    let compiledScript;
+    try {
+        compiledScript = new VMScript(script).compile();
+    } catch (err) {
+        console.log(err);
+    }
+    
+    let mainFunction = vm.run(compiledScript)
     let results = [];
+    let err;
     //TODO: Run each test multiple times to get more consistent result;
     testCases.forEach((element , index)=> {    //run for each test case;
         let executionTime = process.hrtime(); //get a start time;
@@ -45,7 +53,7 @@ function TestProgram(testCases, expectedOutputs){ //This piece will run the code
         executionTime = process.hrtime(executionTime) //get end time which is a 2 element array a[0] seconds part, a[1] nanoseconds part;
         results.push([resultString, FormatExecutionTime(executionTime)]);//push the results to array;    
     });
-    return results;
+    return {err, results};
 }
 
 

@@ -2,12 +2,16 @@ const { v1 } = require('uuid');
 const {createClient} = require('redis');
 const client = createClient();
 client.connect();
-
+client.on('error', (err)=>console.log('Redis client Error:: ',err));
 
 
 
 module.exports.createUserConnection = function CreateUserConnection(userId, socketId){
     client.set(userId.toString(), socketId.toString());
+}
+
+module.exports.getUserConnection= function GetUserConnection(userId){
+    return client.get(userId);
 }
 
 module.exports.destroyUserConnection =  function DestroyUserConnection(userId){
@@ -27,6 +31,12 @@ module.exports.createGame = async function CreateGame(players, question){
 module.exports.getPlayersByGameId = function GetPlayersByGameId(gameId){
     return client.hGet(gameId, 'Players');
 }
+
+module.exports.isUserInTheGame = async function IsUserInGame(userId, gameId){
+    let players = GetPlayersByGameId(gameId);
+    return players.find(x=>x===userId)?true:false;
+}
+
 module.exports.getQuestionByGameId = function GetQuestionByGameId(gameId){
     return client.hGet(gameId, 'Question');
 }
