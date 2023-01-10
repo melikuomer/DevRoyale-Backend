@@ -3,7 +3,7 @@ const router = express.Router({});
 
 module.exports = router;
 
-router.post('/',addQuestion)
+router.post('/new',addQuestion)
 
 const format = {
     question: 'ŞU DURUMLARDA ŞÖYLE OLSUN BÖYLE YAPIN AMK',
