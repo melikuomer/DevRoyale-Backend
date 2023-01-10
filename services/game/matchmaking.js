@@ -97,20 +97,24 @@ let queue  = new Queue(queueConfig);
 queue.Init();
 
 
+//Test();
+
 //queue test
-setTimeout(()=>{
-    let player = {"id": 231124, "tempElo": 1200};
-    let secondPlayer = {"id": 256124, "tempElo": 900};
-    queue.AddPlayer([player]);
-    queue.AddPlayer([secondPlayer])
-    queue.AddPlayer([player]);
-    queue.AddPlayer([player]);
-    console.log(queue.queueList)
-    queue.AddPlayer([player]);
+function Test(){
     setTimeout(()=>{
-        console.log(queue.queueList);
-    }, 1000*2);
-}, 1000*1)
+        let player = {"id": 231124, "tempElo": 1200};
+        let secondPlayer = {"id": 256124, "tempElo": 900};
+        queue.AddPlayer([player]);
+        queue.AddPlayer([secondPlayer])
+        queue.AddPlayer([player]);
+        queue.AddPlayer([player]);
+        console.log(queue.queueList)
+        queue.AddPlayer([player]);
+        setTimeout(()=>{
+            console.log(queue.queueList);
+        }, 1000*2);
+    }, 1000*1)
+}
 
 
 

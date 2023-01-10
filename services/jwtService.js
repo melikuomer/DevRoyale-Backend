@@ -22,7 +22,7 @@ exports.authenticateToken = function authenticateToken(req, res, next) {
 
 
 exports.getUserFromToken = function getUserFromToken(token){
-    return jwt.decode(token);
+    return jwt.decode(token, secret).user_id;
 }
 
 exports.createToken = function createToken(req, res, next){

@@ -28,17 +28,35 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-    var socket = io();
+    var socket;
 
-    socket.on('GameState', (data)=>{
-    alert(data.Zort);
-    })
+    // socket.on('GameState', (data)=>{
+    // alert(data.Zort);
+    // })
   function JoinQueue(){
+    SetSocket();
+    
+    
     let id = document.getElementById('userId').value;
     let elo = document.getElementById('elo').value
     socket.emit('JoinQueue',{id: id, elo:elo});
   }
 
+  function SetSocket(){
+    if(!socket){ socket =io({
+      extraHeaders: {
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxMDA3MCwiaWF0IjoxNjczMzc4NTAyLCJleHAiOjE2NzM0MjE3MDJ9.YWy19etc-jRh83RS-MGd3xu3Z-FShJLq6M81-PnERj0"
+        }
+      });
+    }
+
+    socket.on('pong', data=>setTimeout((data)=>{
+      console.log('pong');
+      socket.emit('ping');
+    },5*1000));
+
+    socket.emit('ping');
+  };
   function SubmitCode(){
 
   }
