@@ -37,12 +37,22 @@ exports.getUserByEmail = async function (email,callback) {
 };
 
 exports.getQuestion = async function (question_id, callback) {
-  const sql = "SELECT * FROM users WHERE id = ?";
+  const sql = "SELECT * FROM questions WHERE id = ?";
   con.query(sql, question_id ,function (error, results, fields) {
     if (error) return callback(new Error(error),null);
     callback(null, results);
   });
 };
+
+exports.createQuestion = function (question, callback) {
+  const sql = `INSERT INTO devroyale.questions(question)VALUES( ? );`
+  con.query(sql,question, function (error, results, fields) {
+    if (error) return callback(new Error(error),null);
+    callback(null, results.insertId);
+  });
+};
+
+
 
 
 
