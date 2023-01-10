@@ -45,7 +45,7 @@ app.use('/session',require("./routes/session.js"));
 app.use('/matchmaking', require("./routes/matchmaking.js"));
 app.use('/user',require("./routes/user.js"));
 app.use('/register',require("./routes/register.js"));
-app.use('/login',require("./routes/login.js"))
+app.use('/login',require("./routes/login.js"));
 
 
 

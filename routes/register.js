@@ -23,7 +23,11 @@ async function registerUser(req,response) {
           queries.createUser(newUser, (error, user_id) => {
             // TODO make error handling better 
             if (error) return response.status(404).send(error.toString());
-            return response.json(JSON.stringify(user_id));})
+            queries.createStats(user_id,(error,result) => {
+            if (error) return response.status(404).send(error.toString());
+            });
+
+            return response.json(JSON.stringify(user_id));});
     } catch (error) {
         response.status(500).send()
     }
