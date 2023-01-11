@@ -34,6 +34,14 @@ module.exports.createGame = async function CreateGame(players, question){
     await Promise.all([pQuestion, pPlayersHash]);
     return pGameId;
 }
+
+module.exports.removePlayerFromGame = async function RemovePlayerFromGame(gameId,playerId){
+    let pPlayersHash = await client.hGet(gameId, 'Players');
+    pPlayerHash = pPlayersHash.filter(x=>x==playerId);
+    await client.hSet(gameId,'Players');
+    
+}
+
 module.exports.getPlayersByGameId = function GetPlayersByGameId(gameId){
     return client.hGet(gameId, 'Players');
 }

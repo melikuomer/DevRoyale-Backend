@@ -38,7 +38,7 @@ function TestProgram(testCases, expectedOutputs, script){ //This piece will run 
         console.log(err);
     }
     
-    let mainFunction = vm.run(compiledScript)
+    let mainFunction = vm.run(script)
     let results = [];
     let err;
     //TODO: Run each test multiple times to get more consistent result;
@@ -65,7 +65,7 @@ function FormatExecutionTime(executionTime){  //converts second and nanosecond p
 }
 
 
-console.log(TestProgram(input,expectedOutput));
+//console.log(TestProgram(input,expectedOutput));
 
 
 vm.on('console.log' ,(value => { //console output on the sandbox redirects to here;
@@ -75,7 +75,7 @@ vm.on('console.log' ,(value => { //console output on the sandbox redirects to he
 
 
 
-
+module.exports.testProgram = TestProgram;
 //vm.run('console.log(1323)'); // returns 1337
 
 //todo add eslint
