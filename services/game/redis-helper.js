@@ -3,10 +3,13 @@ const {createClient} = require('redis');
 
 const redisConfig = require('../../config.json').redis;
 const client = createClient({url: redisConfig.url});
+client.connect();
 
-
-client.connect().catch(err=>console.log("LANET OLSUN: "+err));
+console.log(redisConfig.url);
 client.on('error', (err)=>console.log('Redis client Error:: ',err));
+
+client.on('connect', () => console.log('Connection to redis: SUCCEED '));
+
 
 
 
@@ -17,7 +20,7 @@ module.exports.createUserConnection = function CreateUserConnection(userId, sock
 }
 
 module.exports.getUserConnection= function GetUserConnection(userId){
-    return client.get(userId);
+    return client.get(userId.toString());
 }
 
 module.exports.destroyUserConnection =  function DestroyUserConnection(userId){
@@ -37,7 +40,7 @@ module.exports.createGame = async function CreateGame(players, question){
 
 module.exports.removePlayerFromGame = async function RemovePlayerFromGame(gameId,playerId){
     let pPlayersHash = await client.hGet(gameId, 'Players');
-    pPlayerHash = pPlayersHash.filter(x=>x==playerId);
+    pPlayersHash = pPlayersHash.filter(x=>x==playerId);
     await client.hSet(gameId,'Players');
     
 }
@@ -47,8 +50,10 @@ module.exports.getPlayersByGameId = function GetPlayersByGameId(gameId){
 }
 
 module.exports.isUserInTheGame = async function IsUserInGame(userId, gameId){
-    let players = GetPlayersByGameId(gameId);
-    return players.find(x=>x===userId)?true:false;
+    let players = await client.hGet(gameId, 'Players');
+    players = JSON.parse(players);
+    
+    return players.find(x=>x.id===userId)?true:false;
 }
 
 module.exports.getQuestionByGameId = function GetQuestionByGameId(gameId){

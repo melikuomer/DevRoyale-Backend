@@ -1,7 +1,7 @@
 const queueConfig = require('../../config.json').queue; 
 const  events = require('events');
 
-const EMPTY_SLOT = {"id":0, "tempElo":0};
+const EMPTY_SLOT = {"id":0, "elo":0};
 
 
 class Queue {
@@ -17,16 +17,17 @@ class Queue {
     }
 
     AddPlayer = function (players){ 
-
         const player = players[0];
-        let rootIndex = this.EloToIndex(player.tempElo);
+
+        console.log(player.id + ' Added to queue')
+        let rootIndex = this.EloToIndex(player.elo);
         let currentIndex;
         if(!players[1]){
             currentIndex = rootIndex;
         }else currentIndex =players[1]
 
         if(currentIndex>=this.queueList.length)return;
-
+        console.log(currentIndex);
         switch (this.queueList[currentIndex].id) {
             case 0:
                 this.queueList[currentIndex]= player;
@@ -52,12 +53,13 @@ class Queue {
     }
     
     MatchFound= function(players){
-        this.ResetPocket(this.EloToIndex(players[0].tempElo));        
-        this.CheckAdjacentRecursive(this.EloToIndex(players[0].tempElo), players[0].id,(index) =>{    
+        console.log('matchmade: '+JSON.stringify(players));
+        this.ResetPocket(this.EloToIndex(players[0].elo));        
+        this.CheckAdjacentRecursive(this.EloToIndex(players[0].elo), players[0].id,(index) =>{    
             this.ResetPocket(index);            
         });
-        this.ResetPocket(this.EloToIndex(players[1].tempElo));        
-        this.CheckAdjacentRecursive(this.EloToIndex(players[1].tempElo), players[1].id,(index) =>{    
+        this.ResetPocket(this.EloToIndex(players[1].elo));        
+        this.CheckAdjacentRecursive(this.EloToIndex(players[1].elo), players[1].id,(index) =>{    
             this.ResetPocket(index);            
         });
        
@@ -88,7 +90,7 @@ class Queue {
     }
 
     EloToIndex = function (elo){
-        return parseInt(elo / this.pocketSize);
+        return Math.floor(elo / this.pocketSize);
     }
 
 }
@@ -102,8 +104,8 @@ queue.Init();
 //queue test
 function Test(){
     setTimeout(()=>{
-        let player = {"id": 231124, "tempElo": 1200};
-        let secondPlayer = {"id": 256124, "tempElo": 900};
+        let player = {"id": 231124, "elo": 1200};
+        let secondPlayer = {"id": 256124, "elo": 900};
         queue.AddPlayer([player]);
         queue.AddPlayer([secondPlayer])
         queue.AddPlayer([player]);

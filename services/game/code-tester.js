@@ -36,11 +36,16 @@ function TestProgram(testCases, expectedOutputs, script){ //This piece will run 
         compiledScript = new VMScript(script).compile();
     } catch (err) {
         console.log(err);
+        let result;
+        return {err, result};
     }
     
     let mainFunction = vm.run(script)
     let results = [];
     let err;
+    console.log('Test Cases: ' + testCases);
+    console.log('Expected Results: ' + expectedOutputs)
+
     //TODO: Run each test multiple times to get more consistent result;
     testCases.forEach((element , index)=> {    //run for each test case;
         let executionTime = process.hrtime(); //get a start time;

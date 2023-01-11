@@ -13,12 +13,9 @@ const io = new Server(server)
 
 
 
-
-
-
 const queue = require('./services/game/matchmaking.js');
 const queries = require("./services/mysql-manager.js");
-const {createUserConnection, isUserInTheGame, getQuestionByGameId, removePlayerFromGame, getPlayersByGameId} = require('./services/game/redis-helper.js');
+const redis = require('./services/game/redis-helper.js');
 const { testProgram } = require('./services/game/code-tester.js');
 
 
@@ -48,61 +45,75 @@ app.use('/question', require("./routes/question.js"));
 
 
 
+
 io.on('connect', (socket) => {
     const token = socket.request.headers.authorization.split(' ')[1]; //Get Token From Header;
     const userId = getUserFromToken(token); //Convert Token to User Id;
     if(userId)
-    createUserConnection(userId, socket.id); //Create a map to easily access the socket with userId
+    redis.createUserConnection(userId, socket.id); //Create a map to easily access the socket with userId
     
     socket.on('JoinQueue', (value)=>{
         
         
-        let elo = queries.getUser(userId, (err, value)=>{ //Get user stats from db
+             
+        queries.getElo(userId, (err, value)=>{ //Get user stats from db
             if(err) console.log(err);
-            console.log(value);
+            
+            let player = {id: value[0].user_id, elo:value[0].elo};
+            console.log()
+            queue.AddPlayer([player, null]);
         });
-        //queue.AddPlayer({id: id, elo: elo}) //Push player into queue
+         //Push player into queue
         //console.log(JSON.stringify(stuff))
     })
     
     
     socket.on('Test', ({code, gameId})=>{
-        if (!isUserInTheGame(userId,gameId)) {
+        
+        console.log(code +'\n'+ gameId);
+        
+        if (!redis.isUserInTheGame(userId,gameId)) {
             console.err('User is not in a game');
             return;
         }
         //Test the code
-        const question =getQuestionByGameId(gameId);
-        const {err,results} = testProgram(question.testCases, question.expectedOutputs, code);
+        redis.getQuestionByGameId(gameId).then(rawQuestion=>{
+            const question = JSON.parse(rawQuestion);
+            console.log(question);
+            const {err,results} = testProgram(question.TestCases, question.ExpectedResults, code);
+    
+            if(err)
+            {
+                socket.emit('TestFailed', err)
+                return;
+            }
+            //kullanıcıya sonuçları gönder;
+            console.log(results);
+            socket.emit('TestPassed', results);
 
-        if(err)
-        {
-            //kullanıcıya malsın de
-            //returnle
-        }
-
-        //kullanıcıya sonuçları gönder;
+        });
+       
     })
 
-    socket.on('Submit', (code)=>{
-        if (!isUserInTheGame(userId,gameId)) {
+    socket.on('Submit', (code, game)=>{
+        if (!redis.isUserInTheGame(userId,gameId)) {
             console.err('User is not in a game');
             return;
         }
         //Test the code
-        const question =getQuestionByGameId(gameId);
+        const question =redis.getQuestionByGameId(gameId);
         const {err,results} = testProgram(question.testCases, question.expectedOutputs, code);
 
         if(err)
         {
-            //kullanıcıya malsın de
-            //returnle
+            socket.emit('TestFailed', err)
+            return;
         }
-
         //kullanıcıya sonuçları gönder;
+        socket.emit('TestPassed', results);
         //bağlantıyı sonlandır.
-        removePlayerFromGame(gameId, userId);
-        if(getPlayersByGameId(gameId).length<1){
+        redis.removePlayerFromGame(gameId, userId);
+        if(redis.getPlayersByGameId(gameId).length<1){
             // Maçı bitir
             //kazananı seç
             //update elo
@@ -114,7 +125,25 @@ io.on('connect', (socket) => {
 });
 
 
+queue.Event.on('MatchFound',(players)=>{
 
+    queries.getQuestion(1,(err, question)=>{
+
+        if (err) console.log(err);
+        redis.createGame(players, question[0].question).then((gameId)=>{
+
+            console.log('eslestirildi, oyun kodu:' +gameId +' oyuncular: ' + JSON.stringify(players));
+            
+            players.forEach(player => {
+                redis.getUserConnection(player.id).then(value=>{
+                    io.to(value).emit('MatchFound',gameId);
+                });
+            });
+        });
+
+    });
+    
+})
 
 io.on('disconnect', (socket)=>console.log(socket.id));
 

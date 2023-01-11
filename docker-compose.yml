@@ -1,0 +1,10 @@
+version: '2.2'
+services:
+  redis:
+    image: redis
+    container_name: redis
+    mem_limit: 2G
+    command: [ "redis-server", "--appendonly", "yes" ]
+    hostname: redis
+    ports:
+      - "6379:6379"

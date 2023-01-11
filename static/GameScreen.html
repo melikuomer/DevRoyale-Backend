@@ -6,6 +6,9 @@
 </head>
 
 <body>
+  <label for="jwt">JWT</label>
+    <textarea name="jwt" id="jwt" cols="30" rows="10"></textarea>
+    <div></div>
     <label for="userId">Kullanıcı Idsi</label>
     <input id = "userId" name = "userId" value ="1231224"></input>
     <label for ="elo">Elo</label>
@@ -18,9 +21,13 @@
     <div><label for ="code">Kod:</label></div>
     
 
-    <textarea id="code" name="code"></textarea>
+    <textarea id="code" name="code">module.exports = function (value){
+
+      return value[0] + value[1];
+      
+      }</textarea>
     <div></div>
-    <button onclick="TestCode">Kodu Test Et</button>
+    <button onclick="TestCode()">Kodu Test Et</button>
 
     <button type="button" onclick="SubmitCode">Kodu Gönder</button>
 </body>
@@ -29,6 +36,7 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
     var socket;
+    let gameId;
 
     // socket.on('GameState', (data)=>{
     // alert(data.Zort);
@@ -45,10 +53,14 @@
   function SetSocket(){
     if(!socket){ socket =io({
       extraHeaders: {
-        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxMDA3MCwiaWF0IjoxNjczMzc4NTAyLCJleHAiOjE2NzM0MjE3MDJ9.YWy19etc-jRh83RS-MGd3xu3Z-FShJLq6M81-PnERj0"
+        "Authorization": 'Bearer '+ document.getElementById('jwt').value
         }
       });
     }
+    socket.on('MatchFound', data=>{
+      console.log('Maç Bulundu:' + JSON.stringify(data))
+      gameId = data;
+    });
 
     socket.on('pong', data=>setTimeout((data)=>{
       console.log('pong');
@@ -62,7 +74,8 @@
   }
 
   function TestCode(){
-
+      console.log(gameId);
+      socket.emit('Test', {code: document.getElementById('code').value, gameId: gameId});
   }
 </script>
 </html>
