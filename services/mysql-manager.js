@@ -106,6 +106,15 @@ exports.createStats = function (user_id, callback) {
 };
 
 
+exports.getProfile = function (user_id, callback) {
+  const sql = `SELECT * FROM users
+  LEFT JOIN stats ON users.user_id = stats.user_id where users.user_id = ?;`;
+  con.query(sql, user_id , function (error, results, fields) {
+    if (error) return callback(new Error(error),null);
+    callback(null, results[0]);
+  });
+};
+
 
 exports.updateUser = function (id, updates, callback) {
   const sql = "UPDATE users SET ? WHERE id = ?";

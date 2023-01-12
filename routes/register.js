@@ -9,6 +9,7 @@ module.exports = router;
 // dont need jwt aut
 async function registerUser(req,response) {
     try {
+        if(req.body.email === "") throw new Error();
         const salt = await bcrypt.genSalt()
         const hashedPassword = await bcrypt.hash(req.body.password, salt)
         console.log(salt);
@@ -29,7 +30,7 @@ async function registerUser(req,response) {
 
             return response.json(JSON.stringify(user_id));});
     } catch (error) {
-        response.status(500).send()
+        response.status(500).send("Bad request")
     }
 }
 
