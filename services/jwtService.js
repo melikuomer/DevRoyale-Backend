@@ -22,6 +22,7 @@ exports.authenticateToken = function authenticateToken(req, res, next) {
 
 
 exports.getUserFromToken = function getUserFromToken(token){
+    console.log(token);
     return jwt.decode(token, secret).user_id;
 }
 

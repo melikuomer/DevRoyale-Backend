@@ -31,6 +31,8 @@ app.use(express.json());
 app.use(express.urlencoded({
     extended: true
 }));
+
+
 app.use(cors());
 
 app.use(((req, res, next) =>{
@@ -52,6 +54,7 @@ app.use('/profile',require("./routes/profile.js"));
 
 io.on('connect', (socket) => {
     const token = socket.request.headers.authorization.split(' ')[1]; //Get Token From Header;
+    if(!token) return;
     const userId = getUserFromToken(token); //Convert Token to User Id;
 
     if(userId)
@@ -72,7 +75,8 @@ io.on('connect', (socket) => {
     
     
     socket.on('Test', ({code, gameId})=>{
-        
+        console.log('gameObject: ' +gameId);
+        //let gameId = gameObject.gameId;
         console.log(code +'\n'+ gameId);
         
         if (!redis.isUserInTheGame(userId,gameId)) {
@@ -87,40 +91,43 @@ io.on('connect', (socket) => {
     
             if(err)
             {
-                socket.emit('TestFailed', err)
+                socket.emit('Results', {error:err})
                 return;
             }
             //kullanıcıya sonuçları gönder;
-            console.log(results);
-            socket.emit('TestPassed', results);
+            socket.emit('Results', {results:results});
 
         });
        
     })
 
-    socket.on('Submit', (code, gameId)=>{
+    socket.on('Submit', ({code, gameId})=>{
         if (!redis.isUserInTheGame(userId,gameId)) {
-            console.err('User is not in a game');
+            console.error('User is not in a game');
             return;
         }
         //Test the code
-        const question =redis.getQuestionByGameId(gameId);
-        const {err,results} = testProgram(question.testCases, question.expectedOutputs, code);
-
-        if(err)
-        {
-            socket.emit('TestFailed', err)
-            return;
-        }
-        //kullanıcıya sonuçları gönder;
-        socket.emit('TestPassed', results);
+        redis.getQuestionByGameId(gameId).then(rawQuestion=>{
+            const question = JSON.parse(rawQuestion);
+            console.log(question);
+            const {err,results} = testProgram(question.TestCases, question.ExpectedResults, code);
+    
+            if(err)
+            {
+                socket.emit('Results', {error:err})
+                return;
+            }
+            //kullanıcıya sonuçları gönder;
+            socket.emit('Results', {results:results});
+            // redis.removePlayerFromGame(gameId, userId);
+            // if(redis.getPlayersByGameId(gameId).length<1){
+            //     // Maçı bitir
+            //     //kazananı seç
+            //     //update elo
+            // } 
+        });
         //bağlantıyı sonlandır.
-        redis.removePlayerFromGame(gameId, userId);
-        if(redis.getPlayersByGameId(gameId).length<1){
-            // Maçı bitir
-            //kazananı seç
-            //update elo
-        } 
+        
     })
 
     console.log(`User ${userId} has connected`);

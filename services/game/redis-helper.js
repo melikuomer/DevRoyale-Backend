@@ -50,6 +50,7 @@ module.exports.getPlayersByGameId = function GetPlayersByGameId(gameId){
 }
 
 module.exports.isUserInTheGame = async function IsUserInGame(userId, gameId){
+    console.log(gameId);
     let players = await client.hGet(gameId, 'Players');
     players = JSON.parse(players);
     
@@ -59,6 +60,7 @@ module.exports.isUserInTheGame = async function IsUserInGame(userId, gameId){
 
 
 module.exports.getQuestionByGameId = function GetQuestionByGameId(gameId){
+    console.log('GameId', gameId);
     return client.hGet(gameId, 'Question');
 }
 

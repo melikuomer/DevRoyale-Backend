@@ -75,7 +75,7 @@
 
   function TestCode(){
       console.log(gameId);
-      socket.emit('Test', {code: document.getElementById('code').value, gameId: gameId});
+      socket.emit('Test', {code: document.getElementById('code').value, gameObject: gameId});
   }
 </script>
 </html>
