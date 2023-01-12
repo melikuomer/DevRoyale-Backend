@@ -41,6 +41,7 @@ app.use('/user',require("./routes/user.js"));
 app.use('/register',require("./routes/register.js"));
 app.use('/login',require("./routes/login.js"));
 app.use('/question', require("./routes/question.js"));
+app.use(authenticateToken);
 app.use('/profile',require("./routes/profile.js"));
 
 

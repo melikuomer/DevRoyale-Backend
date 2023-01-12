@@ -6,17 +6,16 @@ module.exports = router;
 
 
 function getProfile(req, response) {
-
     console.log("girdi");
 
     if (!req.body) {
         response.send("error")
     }
-    queries.getProfile(req.body.user_id, (error, result) => {
+    queries.getProfile(req.user_id, (error, result) => {
         if (error) return response.status(404).send("Cannot get Profile");
-        result.user_id = req.body.user_id;
+        delete result['password'];
         return response.json(result);
     })
 }
 
-router.post('/',getProfile)
+router.get('/', getProfile)
