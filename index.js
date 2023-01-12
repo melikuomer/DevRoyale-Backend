@@ -9,7 +9,12 @@ const app = express();
 const http = require('http');
 const server = http.createServer(app);
 const {Server} = require('socket.io');
-const io = new Server(server)
+const io = new Server(server,{
+    cors: {
+      origin: "*",
+      methods: ["GET", "POST"]
+    }
+  })
 
 
 
@@ -45,15 +50,14 @@ app.use(authenticateToken);
 app.use('/profile',require("./routes/profile.js"));
 
 
-
-
 io.on('connect', (socket) => {
     const token = socket.request.headers.authorization.split(' ')[1]; //Get Token From Header;
     const userId = getUserFromToken(token); //Convert Token to User Id;
+
     if(userId)
     redis.createUserConnection(userId, socket.id); //Create a map to easily access the socket with userId
     
-    socket.on('JoinQueue', (value)=>{
+    socket.on('JoinQueue', (data)=>{
         
         
              
@@ -64,8 +68,6 @@ io.on('connect', (socket) => {
             console.log()
             queue.AddPlayer([player, null]);
         });
-         //Push player into queue
-        //console.log(JSON.stringify(stuff))
     })
     
     
@@ -96,7 +98,7 @@ io.on('connect', (socket) => {
        
     })
 
-    socket.on('Submit', (code, game)=>{
+    socket.on('Submit', (code, gameId)=>{
         if (!redis.isUserInTheGame(userId,gameId)) {
             console.err('User is not in a game');
             return;
@@ -129,15 +131,15 @@ io.on('connect', (socket) => {
 queue.Event.on('MatchFound',(players)=>{
 
     queries.getQuestion(1,(err, question)=>{
-
+        
         if (err) console.log(err);
         redis.createGame(players, question[0].question).then((gameId)=>{
-
+            let {TestCases, ExpectedResults, ...finalQuestion} = question[0].question;
             console.log('eslestirildi, oyun kodu:' +gameId +' oyuncular: ' + JSON.stringify(players));
             
             players.forEach(player => {
                 redis.getUserConnection(player.id).then(value=>{
-                    io.to(value).emit('MatchFound',gameId);
+                    io.to(value).emit('MatchFound',{gameId:gameId,question:finalQuestion});
                 });
             });
         });
