@@ -12,10 +12,10 @@ module.exports = router;
 // TODO use params
 // TODO working now copt this to others
 function RegisterUser(req, response) {
-    console.log("RegisterUser Route");
+    console.log("RegisterUser Route", req.body);
   let newUser = {
-    firstName: req.body.firstName,
-    lastname: req.body.lastname,
+    firstName: req.body.first_name,
+    lastName: req.body.last_name,
     email: req.body.email,
     password: req.body.password, //todo add passwd security
   };

@@ -15,8 +15,8 @@ async function registerUser(req,response) {
         console.log(salt);
         console.log(hashedPassword);
         let newUser = {
-            firstName: req.body.firstName,
-            lastname: req.body.lastname,
+            firstName: req.body.first_name,
+            lastname: req.body.last_name,
             email: req.body.email,
             password: hashedPassword,
         };
