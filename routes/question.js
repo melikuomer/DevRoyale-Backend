@@ -1,68 +1,38 @@
 const express = require('express');
 const router = express.Router({});
+const queries = require("../services/mysql-manager.js");
 
 module.exports = router;
 
-router.post('/new',addQuestion)
 
-const format = {
-    question: 'ŞU DURUMLARDA ŞÖYLE OLSUN BÖYLE YAPIN AMK',
-    competitionTime: '15',
-    testCases: '1,2,3,4/5,6,7,8/9,10,11,12',
-    expectedOutput: '3,5,1'
-  }
+router.get('/', getQuestion);
 
-function addQuestion(req, res){
-    let values = req.body.testCases.split('\r\n');
-    let testCases = [];
-    values.forEach(element => {
-        testCases.push(element.split(','))
-    });
+router.post('/',createQuestion)
 
-    let expectedOutput = req.body.expectedOutput.split(',');
-
-    let question = {
-        question: req.body.question,
-        competitionTime: req.body.competitionTime,
-        testCases: testCases,
-        expectedOutput: expectedOutput
-    }
-    console.log(question);
+const exampleQuestionFormat = {
+    "TestCases": [
+        [ 1, 3, 3, 3, 4, 6 ],
+        [ 2, 5, 7, 4, 7 ],
+        [ 1, 2, 0, -1, -3]
+    ],
+    "QuestionText": "Find average of an list.",
+    "ExpectedResults": [ 3, 5, -0.2 ],
+    "RequiredTimebyMinute": 5
 }
-
-
-
-
-
-
-
-
-
-
-
-const queries = require("../services/mysql-manager.js");
-
-
-
 
 // dont need jwt aut
 function getQuestion(req,response) {
-    const question_id = req.body.question_id; 
+    const question_id = req.body.question_id;
     queries.getQuestion(question_id, (error, resp) => {
         if (error) return response.status(404).send(error.toString());
         return response.json(resp);
     });
-}   
+}
 
 function createQuestion(req,response ) {
     const question = req.body
     queries.createQuestion( JSON.stringify(question) ,(error,resp) => {
         if (error) return response.status(404).send(error.toString());
         return response.json(resp)
-    })    
+    })
 }
-
-router.post('/', getQuestion);
-
-
-router.post('/create',createQuestion)
