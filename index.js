@@ -22,7 +22,7 @@ const queue = require('./services/game/matchmaking.js');
 const queries = require("./services/mysql-manager.js");
 const redis = require('./services/game/redis-helper.js');
 const { testProgram } = require('./services/game/code-tester.js');
-
+const game = require('./services/game/game.js');
 
 process.title = require("./package.json").name;
 
@@ -119,12 +119,17 @@ io.on('connect', (socket) => {
             }
             //kullanıcıya sonuçları gönder;
             socket.emit('Results', {results:results});
-            // redis.removePlayerFromGame(gameId, userId);
-            // if(redis.getPlayersByGameId(gameId).length<1){
-            //     // Maçı bitir
-            //     //kazananı seç
-            //     //update elo
-            // } 
+
+            let player =redis.getPlayer(gameId, userId)
+            player.Results = results;
+            player.Submitted = true;
+            redis.setPlayer(gameId, player);
+            // sonuçları redise yaz
+            if(redis.GetOtherPlayer(gameId, userId).Submitted){
+                game.EndGame(gameId);
+            }
+
+            
         });
         //bağlantıyı sonlandır.
         
@@ -143,7 +148,12 @@ queue.Event.on('MatchFound',(players)=>{
         redis.createGame(players, question[0].question).then((gameId)=>{
             let {TestCases, ExpectedResults, ...finalQuestion} = question[0].question;
             console.log('eslestirildi, oyun kodu:' +gameId +' oyuncular: ' + JSON.stringify(players));
-            
+            setTimeout(()=>{
+
+                game.EndGame(gameId);
+
+
+            }, question[0].question.RequiredTimebyMinute*1000*60)
             players.forEach(player => {
                 redis.getUserConnection(player.id).then(value=>{
                     io.to(value).emit('MatchFound',{gameId:gameId,question:finalQuestion});

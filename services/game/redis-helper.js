@@ -33,6 +33,7 @@ module.exports.createGame = async function CreateGame(players, question){
     const pGameId = v1(); //Timestamp based uuid;    
     const pQuestion=  client.hSet(pGameId, 'Question',JSON.stringify(question));
     const pPlayersHash =  client.hSet(pGameId, 'Players', JSON.stringify(players));
+    
 
     await Promise.all([pQuestion, pPlayersHash]);
     return pGameId;
@@ -48,6 +49,41 @@ module.exports.removePlayerFromGame = async function RemovePlayerFromGame(gameId
 module.exports.getPlayersByGameId = function GetPlayersByGameId(gameId){
     return client.hGet(gameId, 'Players');
 }
+
+module.exports.getPlayer = function GetPlayersByGameId(gameId , playerId){
+    let players = JSON.parse(client.hGet(gameId, 'Players'));
+
+    players.forEach(player => {
+        if (player.playerId === playerId) return player;
+    });
+
+
+}
+
+module.exports.GetOtherPlayer = function GetPlayersByGameId(gameId , playerId){
+    let players = JSON.parse(client.hGet(gameId, 'Players'));
+
+    players.forEach(player => {
+        if (player.playerId !== playerId) return player;
+    });
+
+
+}
+
+module.exports.setPlayer = function GetPlayersByGameId(gameId , user){
+    let players = JSON.parse(client.hGet(gameId, 'Players'));
+
+    players.forEach(player => {
+        if (player.playerId === user.playerId) {
+            player = user;
+            client.hSet(gameId, 'Players', JSON.stringify(players));
+        }
+    });
+
+
+}
+
+
 
 module.exports.isUserInTheGame = async function IsUserInGame(userId, gameId){
     console.log(gameId);

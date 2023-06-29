@@ -40,3 +40,6 @@ const calculateNewElos = function(winnerPlayer,loserPlayer){ // calculates new e
 }
 
 calculateNewElos(player2,player1);
+
+
+module.exports.calculateNewElos = calculateNewElos;
