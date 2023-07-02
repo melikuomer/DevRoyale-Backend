@@ -46,39 +46,51 @@ module.exports.removePlayerFromGame = async function RemovePlayerFromGame(gameId
     
 }
 
-module.exports.getPlayersByGameId = function GetPlayersByGameId(gameId){
-    return client.hGet(gameId, 'Players');
+module.exports.getPlayersByGameId = async function GetPlayersByGameId(gameId){
+    let players = await client.hGet(gameId, 'Players');
+    players = JSON.parse(players)
+
+    return players;
 }
 
-module.exports.getPlayer = function GetPlayersByGameId(gameId , playerId){
-    let players = JSON.parse(client.hGet(gameId, 'Players'));
+module.exports.getPlayer = async function getPlayer(gameId , playerId){
+    let players = await client.hGet(gameId, 'Players');
+    players = JSON.parse(players)
+
+    console.log("getPlayer players",players);
+    console.log(playerId)
 
     players.forEach(player => {
-        if (player.playerId === playerId) return player;
+        if (player.id === playerId) return player;
     });
 
 
 }
 
-module.exports.GetOtherPlayer = function GetPlayersByGameId(gameId , playerId){
-    let players = JSON.parse(client.hGet(gameId, 'Players'));
+module.exports.GetOtherPlayer = async function GetOtherPlayer(gameId , playerId){
+    let players = await client.hGet(gameId, 'Players');
+    players = JSON.parse(players);
 
     players.forEach(player => {
-        if (player.playerId !== playerId) return player;
+        if (player.id !== playerId) return player;
     });
 
 
 }
 
-module.exports.setPlayer = function GetPlayersByGameId(gameId , user){
-    let players = JSON.parse(client.hGet(gameId, 'Players'));
+module.exports.setPlayer = async function setPlayer(gameId , user){
+    let players = await client.hGet(gameId, 'Players');
+    players = JSON.parse(players);
+
+    console.log("players", players);
 
     players.forEach(player => {
-        if (player.playerId === user.playerId) {
+        if (player.id === user.user_id) {
             player = user;
-            client.hSet(gameId, 'Players', JSON.stringify(players));
         }
     });
+    console.log(players);
+    await client.hSet(gameId, 'Players', JSON.stringify(players));
 
 
 }
@@ -90,7 +102,7 @@ module.exports.isUserInTheGame = async function IsUserInGame(userId, gameId){
     let players = await client.hGet(gameId, 'Players');
     players = JSON.parse(players);
     
-    return players.find(x=>x.id===userId)?true:false;
+    return !!players.find(x => x.id === userId);
 }
 
 

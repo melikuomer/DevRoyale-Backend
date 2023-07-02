@@ -105,6 +105,14 @@ exports.createStats = function (user_id, callback) {
   });
 };
 
+exports.getStats = function (user_id, callback) {
+  const sql = `SELECT * devroyale.stats WHERE = ?;`
+  con.query(sql,user_id, function (error, results, fields) {
+    if (error) return callback(new Error(error),null);
+    callback(null, results.insertId);
+  });
+}
+
 
 exports.getProfile = function (user_id, callback) {
   const sql = `SELECT * FROM users

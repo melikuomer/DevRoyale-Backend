@@ -1,8 +1,26 @@
 const {authenticateToken, getUserFromToken} = require('./services/jwtService.js');
 
 const express =require("express");
+const axios = require('axios');
 const cors = require("cors");
 const app = express();
+
+// type defs
+
+const AvailableLanguages = {
+    JavaScript: "JavaScript",
+    Python: "Python",
+    Cpp: "C++"
+}
+
+const AxiosHeaders = {
+    headers: {
+        'Content-Type': 'application/json'
+    }
+}
+
+const microServices = require("./config.json").microServices;
+
 
 
 
@@ -62,7 +80,7 @@ io.on('connect', (socket) => {
     
     socket.on('JoinQueue', (data)=>{
         
-        
+        console.log("JoinQueue data ", data);
              
         queries.getElo(userId, (err, value)=>{ //Get user stats from db
             if(err) console.log(err);
@@ -73,11 +91,13 @@ io.on('connect', (socket) => {
         });
     })
     
-    
-    socket.on('Test', ({code, gameId})=>{
+    socket.on('Test', ({code, gameId, language})=>{
         console.log('gameObject: ' +gameId);
         //let gameId = gameObject.gameId;
         console.log(code +'\n'+ gameId);
+        console.log("userId",userId);
+        console.log("language",language)
+
         
         if (!redis.isUserInTheGame(userId,gameId)) {
             console.err('User is not in a game');
@@ -87,21 +107,37 @@ io.on('connect', (socket) => {
         redis.getQuestionByGameId(gameId).then(rawQuestion=>{
             const question = JSON.parse(rawQuestion);
             console.log(question);
-            const {err,results} = testProgram(question.TestCases, question.ExpectedResults, code);
-    
-            if(err)
-            {
-                socket.emit('Results', {error:err})
-                return;
+
+            let endPoint = MicroServiceURL(language);
+
+            var jsonString = Buffer.from(code);
+            let value = jsonString.toString("base64");
+
+            const gatewayBody = {
+                "code": value,
+                "test_cases": question.TestCases,
+                "expected_results": question.ExpectedResults
             }
-            //kullanıcıya sonuçları gönder;
-            socket.emit('Results', {results:results});
+
+            console.log("gatewayBody",gatewayBody);
+
+            axios.post(endPoint,gatewayBody)
+                .then(response => {
+                    console.log(response.data)
+                    socket.emit('Results', response.data )
+                }).catch( error => {
+                    console.log("error.message 1",error.message)
+                    socket.emit('Results', error )
+            })
+
 
         });
-       
+
     })
 
-    socket.on('Submit', ({code, gameId})=>{
+    socket.on('Submit', ({code, gameId, language})=>{
+
+
         if (!redis.isUserInTheGame(userId,gameId)) {
             console.error('User is not in a game');
             return;
@@ -110,8 +146,57 @@ io.on('connect', (socket) => {
         redis.getQuestionByGameId(gameId).then(rawQuestion=>{
             const question = JSON.parse(rawQuestion);
             console.log(question);
+
+            // get MicroService URL
+            const endPoint = MicroServiceURL(language);
+
+            var jsonString = Buffer.from(code);
+            let value = jsonString.toString("base64");
+
+            const gatewayBody = {
+                "code": value,
+                "test_cases": question.TestCases,
+                "expected_results": question.ExpectedResults
+            }
+
+            console.log("gatewayBody",gatewayBody);
+
+            axios.post(endPoint,gatewayBody)
+                .then(response => {
+                    console.log("response.data",response.data)
+                    socket.emit('Results', response.data )
+
+                    tempPlayer = redis.getPlayer(gameId, userId);
+
+                    console.log("tempPlayer",tempPlayer);
+
+                    redis.getPlayer(gameId, userId).then( player => {
+                        console.log("player",player);
+
+                        player.Results = response.data;
+                        player.Submitted = true;
+                        console.log("player",player);
+                        redis.setPlayer(gameId, player);
+                        // sonuçları redise yaz
+                        if(redis.GetOtherPlayer(gameId, userId).Submitted){
+                            game.EndGame(gameId);
+                        }
+
+                    })
+
+                }).catch( error => {
+                console.log("error.massege",error )
+                socket.emit('Results', error )
+            })
+
+
+
+
+
+
+            /*
             const {err,results} = testProgram(question.TestCases, question.ExpectedResults, code);
-    
+
             if(err)
             {
                 socket.emit('Results', {error:err})
@@ -129,10 +214,12 @@ io.on('connect', (socket) => {
                 game.EndGame(gameId);
             }
 
-            
+             */
+
+
         });
         //bağlantıyı sonlandır.
-        
+
     })
 
     console.log(`User ${userId} has connected`);
@@ -143,7 +230,7 @@ io.on('connect', (socket) => {
 queue.Event.on('MatchFound',(players)=>{
 
     queries.getQuestion(1,(err, question)=>{
-        
+
         if (err) console.log(err);
         redis.createGame(players, question[0].question).then((gameId)=>{
             let {TestCases, ExpectedResults, ...finalQuestion} = question[0].question;
@@ -162,7 +249,7 @@ queue.Event.on('MatchFound',(players)=>{
         });
 
     });
-    
+
 })
 
 io.on('disconnect', (socket)=>console.log(socket.id));
@@ -176,7 +263,26 @@ app.on('error', (err)=> {
     console.log(err)
 });
 
-
+function MicroServiceURL( language ) {
+    let endPoint;
+    switch (language) {
+        case AvailableLanguages.Cpp:
+            // TODO melikşah'ın url'i ve portu eklenmesi lazım
+            endPoint = `http://${microServices.Cpp.url}:${microServices.Cpp.port}`;
+            break
+        case AvailableLanguages.JavaScript:
+            // must need body
+            endPoint = `http://${microServices.Javascript.url}:${microServices.Javascript.port}/code-statistics`;
+            break
+        case AvailableLanguages.Python:
+            endPoint = `http://${microServices.Pyhton.url}:${microServices.Pyhton.port}/code-statistics`;
+            break
+        default:
+            endPoint = `http://${microServices.Javascript.url}:${microServices.Javascript.port}/code-statistics`;
+            break
+    }
+    return endPoint;
+}
 
 
 
