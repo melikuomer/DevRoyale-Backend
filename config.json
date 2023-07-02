@@ -17,8 +17,8 @@
   },
   "microServices": {
     "Cpp": {
-      "url": "",
-      "port": ""
+      "url": "192.168.195.102",
+      "port": "8080"
     },
     "Javascript": {
       "url": "192.168.195.79",
