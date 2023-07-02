@@ -41,7 +41,7 @@ const exampleResult2 = [
 
 exports.EndGame = async function (gameId){
     //redise gir
-    let players = await redis.getPlayersByGameId();
+    let players = await redis.getPlayersByGameId(gameId);
 
     console.log("END GAME players",players);
 
@@ -63,11 +63,11 @@ exports.EndGame = async function (gameId){
 
         // db üzerinden gerekli güncellemeyi yap.
 
-        mysql.getStats(players[0].user_id, (resp) => {
+        mysql.getStats(players[0].id, (resp) => {
             console.log("respp", resp)
         });
 
-        mysql.getStats(players[1].user_id, (resp) => {
+        mysql.getStats(players[1].id, (resp) => {
             console.log("respp", resp)
         })
 
@@ -76,27 +76,31 @@ exports.EndGame = async function (gameId){
     }
 
 
-    const player0Score = players[0].result?.elapsed_time * players[0].result.peak_memory;
-    const player1Score = players[1].result?.elapsed_time * players[1].result?.peak_memory;
+    const player0Score = players[0].Results?.elapsed_time * players[0].Results.peak_memory;
+    const player1Score = players[1].Results?.elapsed_time * players[1].Results?.peak_memory;
 
 
     let winner;
     let looser;
 
     if ( player0Score < player1Score ) {
-        winner = players[0]
+        winner = players[0];
         looser = players[1];
-        console.log(`playerid ${players[0].user_id}`);
+        console.log(`playerid ${players[0].id}`);
     } else if ( player0Score > player1Score ) {
-        winner = players[1]
+        winner = players[1];
         looser = players[0];
         console.log("player 1 is winner ");
     } else {
-
+        winner = players[0];
+        looser = players[1];
         // beraberlik durumunda db bağlantısı yap statları güncelle
-        mysql.updateElo(winner.playerId, winner.elo)
-        mysql.updateElo(looser.playerId, looser.elo)
-        console.log("beraberlik")
+        mysql.updateElo(winner.id, winner.elo,(err)=>{ console.error("mal yetkin", err)});
+        mysql.updateElo(looser.id, looser.elo,(err)=>{ console.error("mal yetkin", err)});
+        console.log("beraberlik");
+        redis.destroyGame(gameId);
+        return;
+        
     }
 
     //eloları hesapla
@@ -107,8 +111,8 @@ exports.EndGame = async function (gameId){
 
     
     //eloları güncelle
-    mysql.updateElo(winner.playerId, winner.elo);
-    mysql.updateElo(looser.playerId, looser.elo);
+    mysql.updateElo(winner.id, winner.elo,()=>{});
+    mysql.updateElo(looser.id, looser.elo);
 
 
     //oyunu redisten kaldır

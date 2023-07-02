@@ -56,7 +56,7 @@ exports.createQuestion = function (question, callback) {
 
 exports.updateElo = function (user_id, elo , callback) {
   const sql = `UPDATE stats SET elo = ? where user_id = ? ;`
-  con.query(sql,[user_id,elo], function (error, results, fields) {
+  con.query(sql,[elo, user_id], function (error, results, fields) {
     if (error) return callback(new Error(error),null);
     callback(null, results);
   });

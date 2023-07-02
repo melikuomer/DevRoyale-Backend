@@ -166,23 +166,28 @@ io.on('connect', (socket) => {
                     console.log("response.data",response.data)
                     socket.emit('Results', response.data )
 
-                    tempPlayer = redis.getPlayer(gameId, userId);
+                    //let tempPlayer = redis.getPlayer(gameId, userId);
 
-                    console.log("tempPlayer",tempPlayer);
+                    //console.log("tempPlayer",tempPlayer);
 
-                    redis.getPlayer(gameId, userId).then( player => {
+                    
+                    
+                    let endgame = function(player){
                         console.log("player",player);
-
+                        
                         player.Results = response.data;
                         player.Submitted = true;
                         console.log("player",player);
                         redis.setPlayer(gameId, player);
                         // sonuçları redise yaz
-                        if(redis.GetOtherPlayer(gameId, userId).Submitted){
-                            game.EndGame(gameId);
-                        }
 
-                    })
+                        redis.GetOtherPlayer(gameId, userId, (player)=>{
+                            if(player.Submitted) game.EndGame(gameId);
+                        })
+                    } 
+                    
+                    redis.getPlayer(gameId, userId , endgame);
+                    
 
                 }).catch( error => {
                 console.log("error.massege",error )
