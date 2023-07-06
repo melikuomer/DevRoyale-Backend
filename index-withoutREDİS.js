@@ -80,7 +80,7 @@ app.use('/profile',require("./routes/profile.js"));
 
 //         if(err)
 //         {
-//             //kullanıcıya malsın de
+//             //kullanıcıya  de
 //             //returnle
 //         }
 
@@ -98,7 +98,7 @@ app.use('/profile',require("./routes/profile.js"));
 
 //         if(err)
 //         {
-//             //kullanıcıya malsın de
+//             //kullanıcıya  de
 //             //returnle
 //         }
 

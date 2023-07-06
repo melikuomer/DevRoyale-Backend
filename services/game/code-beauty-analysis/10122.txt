@@ -1,0 +1,4 @@
+def question(dizi):
+    toplam = sum(dizi)
+    ortalama = toplam / len(dizi)
+    return ortalama

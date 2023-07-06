@@ -1,6 +1,7 @@
 const redis = require('./redis-helper.js');
 const elo = require('./elo.js');
 const mysql = require('../mysql-manager.js');
+const code_beauty = require ('./code-beauty-analysis/MaintainabilityIndex.js');
 
 const exampleResult = [
     {
@@ -72,17 +73,18 @@ exports.EndGame = async function (gameId){
         })
 
         redis.destroyGame(gameId)
-        return
+        return;
     }
 
 
-    const player0Score = players[0].Results?.elapsed_time * players[0].Results.peak_memory;
-    const player1Score = players[1].Results?.elapsed_time * players[1].Results?.peak_memory;
 
+
+    const player0Score = CalculateScore(players[0]);
+    const player1Score = CalculateScore(players[1]);
 
     let winner;
     let looser;
-
+    console.log(player0Score, " xd ", player1Score);
     if ( player0Score < player1Score ) {
         winner = players[0];
         looser = players[1];
@@ -95,8 +97,8 @@ exports.EndGame = async function (gameId){
         winner = players[0];
         looser = players[1];
         // beraberlik durumunda db bağlantısı yap statları güncelle
-        mysql.updateElo(winner.id, winner.elo,(err)=>{ console.error("mal yetkin", err)});
-        mysql.updateElo(looser.id, looser.elo,(err)=>{ console.error("mal yetkin", err)});
+        mysql.updateElo(winner.id, winner.elo,()=>{ });
+        mysql.updateElo(looser.id, looser.elo,()=>{ });
         console.log("beraberlik");
         redis.destroyGame(gameId);
         return;
@@ -112,12 +114,26 @@ exports.EndGame = async function (gameId){
     
     //eloları güncelle
     mysql.updateElo(winner.id, winner.elo,()=>{});
-    mysql.updateElo(looser.id, looser.elo);
+    mysql.updateElo(looser.id, looser.elo,()=>{});
 
 
     //oyunu redisten kaldır
     redis.destroyGame(gameId);
 
 
+}
+
+function CalculateScore(player){
+    let {code_beauty, Results} = player;
+    let score = 0;
+    Results.forEach((result)=>{
+        let {elapsed_time, peak_memory} = result;
+        score += (0.4 *code_beauty.maintainabilityIndex/100) + (0.3 * (1 - peak_memory/10000)) + (0.3 * (1 - elapsed_time/5));
+        console.log("score", score);
+    })
+    
+    console.log("ssss", Results.length, " ", );
+    
+    return score/Results.length;
 }
 

@@ -4,7 +4,7 @@ const express =require("express");
 const axios = require('axios');
 const cors = require("cors");
 const app = express();
-
+const code_beauty =require("./services/game/code-beauty-analysis/MaintainabilityIndex.js");
 // type defs
 
 const AvailableLanguages = {
@@ -41,6 +41,7 @@ const queries = require("./services/mysql-manager.js");
 const redis = require('./services/game/redis-helper.js');
 const { testProgram } = require('./services/game/code-tester.js');
 const game = require('./services/game/game.js');
+const { getRandomValues } = require('crypto');
 
 process.title = require("./package.json").name;
 
@@ -86,7 +87,6 @@ io.on('connect', (socket) => {
             if(err) console.log(err);
             
             let player = {id: value[0].user_id, elo:value[0].elo};
-            console.log()
             queue.AddPlayer([player, null]);
         });
     })
@@ -170,13 +170,14 @@ io.on('connect', (socket) => {
 
                     //console.log("tempPlayer",tempPlayer);
 
-                    
-                    
+                    let  maintainabilityIndex =code_beauty.FindBeautyParameters(userId, value,LanguageToHFormat(language)) ;
+                    console.log("mindex", maintainabilityIndex);
                     let endgame = function(player){
                         console.log("player",player);
                         
                         player.Results = response.data;
                         player.Submitted = true;
+                        player.code_beauty = maintainabilityIndex;
                         console.log("player",player);
                         redis.setPlayer(gameId, player);
                         // sonuçları redise yaz
@@ -190,7 +191,7 @@ io.on('connect', (socket) => {
                     
 
                 }).catch( error => {
-                console.log("error.massege",error )
+                console.log("error.MESSAGE",error )
                 socket.emit('Results', error )
             })
 
@@ -289,5 +290,27 @@ function MicroServiceURL( language ) {
     return endPoint;
 }
 
+function LanguageToHFormat( language) {
+    let lang
+    switch (language) {
+        case AvailableLanguages.Cpp:
+            // TODO melikşah'ın url'i ve portu eklenmesi lazım
+            lang = "cpp"; 
+            break
+        case AvailableLanguages.JavaScript:
+            // must need body
+            lang = "js";
+            break
+        case AvailableLanguages.Python:
+            lang = "py"
+            break
+        default:
+            console.error("language not supported");
+            break
+    }
+
+
+    return lang;
+}
 
 
